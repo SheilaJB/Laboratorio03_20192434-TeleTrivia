@@ -109,6 +109,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
     private boolean validarConexionInternet(){
+
+        /*
+        Segun se muestra en la teoria, se usa NetworkInfo
+        pero debido a que uso una version mas recinete de API es obsoleto
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        return ni != null && ni.isConnected();
+
+        Promt: estoy empleando la validacion a conexion a intenert pero cuando ingreso NetworkInfo me sale como si estuvia inabilitado en el mismo codigo  NetworkInfo ni = cm.getActiveNetworkInfo(); como podria solucionar el error?
+        Respuesta: Puedes usar NetworkCapabilities en lugar de NetworkInfo para verificar la conexión a Internet en versiones más recientes de Android. Aquí tienes un ejemplo de cómo hacerlo:*/
+
+
         // Inicializar el connectivity manager
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         Network network = cm.getActiveNetwork();
