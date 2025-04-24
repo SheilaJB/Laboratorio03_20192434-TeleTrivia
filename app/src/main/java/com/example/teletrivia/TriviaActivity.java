@@ -44,6 +44,7 @@ public class TriviaActivity extends AppCompatActivity {
     private List<Pregunta> listaPreguntas;
     private int preguntaActual = 0;
     private int correctas = 0;
+    private int incorrectas = 0;
     private CountDownTimer countDownTimer;
     private long tiempoRestante;
     private int tiempoPorPregunta;
@@ -133,6 +134,7 @@ public class TriviaActivity extends AppCompatActivity {
 
                         if (listaPreguntas != null && !listaPreguntas.isEmpty()) {
                             Log.d("TriviaDebug", "Preguntas recibidas: " + listaPreguntas.size());
+
                             iniciarTrivia();
                         } else {
                             Log.w("TriviaDebug", "La lista de preguntas está vacía");
@@ -166,7 +168,13 @@ public class TriviaActivity extends AppCompatActivity {
         mostrarPregunta();
 
         buttonSiguiente.setOnClickListener(v -> {
-            if (verificarRespuesta()) correctas++;
+            if (verificarRespuesta())
+            {
+                correctas++;
+            } else {
+                incorrectas++;
+            }
+
             if (++preguntaActual < listaPreguntas.size()) {
                 mostrarPregunta();
             } else {
@@ -179,6 +187,7 @@ public class TriviaActivity extends AppCompatActivity {
     private void mostrarPregunta() {
         Pregunta pregunta = listaPreguntas.get(preguntaActual);
         textViewPreguntaNumero.setText("Pregunta " + (preguntaActual + 1) + "/" + listaPreguntas.size());
+        Log.d("TriviaDebug", "Mostrando pregunta: " + textViewPreguntaNumero);
         textViewPregunta.setText(Html.fromHtml(pregunta.getQuestion(), Html.FROM_HTML_MODE_LEGACY));
         radioGroupRespuestas.clearCheck();
 
@@ -220,6 +229,7 @@ public class TriviaActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EstadisticasActivity.class);
         intent.putExtra("correctas", correctas);
         intent.putExtra("total", listaPreguntas.size());
+        intent.putExtra("incorrectas",  incorrectas);
         startActivity(intent);
         finish();
     }

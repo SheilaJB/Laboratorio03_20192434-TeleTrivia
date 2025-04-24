@@ -2,6 +2,7 @@ package com.example.teletrivia;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,8 +36,16 @@ public class EstadisticasActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             int correctas = extras.getInt("correctas");
+            Log.d("TriviaDebug", "Correctas: " + correctas);
+
+            int total = extras.getInt("total");
+            Log.d("TriviaDebug", "Total: " + total);
+
             int incorrectas = extras.getInt("incorrectas");
-            int noRespondidas = extras.getInt("noRespondidas");
+            Log.d("TriviaDebug", "Incorrectas: " + incorrectas);
+
+            int noRespondidas = total - (correctas + incorrectas);
+            Log.d("TriviaDebug", "No respondidas: " + noRespondidas);
 
             textViewCorrectas.setText("Correctas: " + correctas);
             textViewIncorrectas.setText("Incorrectas: " + incorrectas);
