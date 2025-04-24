@@ -1,9 +1,11 @@
 package com.example.teletrivia;
 
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,15 +38,12 @@ public class MainActivity extends AppCompatActivity {
         editTextCantidad = findViewById(R.id.editTextCantidad);
         btnComprobarConexion = findViewById(R.id.btnComprobarConexion);
         btnComenzar = findViewById(R.id.btnComenzar);
-
         // Crear las categorias
         String[] categorias = {"Selecionar Categoria","Cultura General", "Libros", "Películas", "Música", "Computación", "Deportes", "Matemática", "Historia"};
         spinnerCategoria.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categorias));
-
         // Crear las dificultades
         String[] dificultades = {"Selecionar Dificultad","Fácil", "Medio", "Difícil"};
         spinnerDificultad.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dificultades));
-
         // Crear el boton de comprobar conexion
         btnComprobarConexion.setOnClickListener(v -> {
 
@@ -61,9 +60,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            // Iniciar juego
+            btnComenzar.setOnClickListener(new View.OnClickListener() {
 
+                @Override
+                public void onClick(View v) {
+                    if (validarConexionInternet()) {
+                        iniciarJuego();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error: Se perdió la conexión a Internet", Toast.LENGTH_SHORT).show();
+                        btnComenzar.setEnabled(false);
+                    }
+
+                }
+            });
         });
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -73,20 +84,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validarCampos() {
-
         String categoriaSeleccionada = spinnerCategoria.getSelectedItem().toString();
         String dificultadSeleccionada = spinnerDificultad.getSelectedItem().toString();
-
         if (categoriaSeleccionada.equals("Selecionar Categoria")) {
             Toast.makeText(this, "Seleccione una categoría válida", Toast.LENGTH_SHORT).show();
             return false;
         }
-
         if (dificultadSeleccionada.equals("Selecionar Dificultad")) {
             Toast.makeText(this, "Seleccione una dificultad válida", Toast.LENGTH_SHORT).show();
             return false;
         }
-
         // Validar que los campos esten completos
         if (spinnerCategoria.getSelectedItem() == null || spinnerDificultad.getSelectedItem() == null || editTextCantidad.getText().toString().isEmpty()) {
             Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
@@ -95,30 +102,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicializar el edittext de cantidad
         int cantidad = Integer.parseInt(editTextCantidad.getText().toString());
-
         if (cantidad <= 0) {
             Toast.makeText(this, "La cantidad debe ser positiva", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-
         return true;
     }
-
     private boolean validarConexionInternet(){
-
         // Inicializar el connectivity manager
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        /*
-        Segun se muestra en la teoria, se usa NetworkInfo
-        pero debido a que uso una version mas recinete de API es obsoleto
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        return ni != null && ni.isConnected();
-
-        Promt: estoy empleando la validacion a conexion a intenert pero cuando ingreso NetworkInfo me sale como si estuvia inabilitado en el mismo codigo  NetworkInfo ni = cm.getActiveNetworkInfo(); como podria solucionar el error?
-        Respuesta: Puedes usar NetworkCapabilities en lugar de NetworkInfo para verificar la conexión a Internet en versiones más recientes de Android. Aquí tienes un ejemplo de cómo hacerlo:
-        */
-
         Network network = cm.getActiveNetwork();
         if (network == null) {
             return false;
@@ -128,5 +120,17 @@ public class MainActivity extends AppCompatActivity {
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
 
+    }
+    //Iniciar Juego Trivia
+    private  void iniciarJuego(){
+        // Crear un Intent para iniciar la actividad de la trivia
+        Intent intent = new Intent(MainActivity.this, TriviaActivity.class);
+        //Enviar data a la actividad TriviaActivity
+        intent.putExtra("cantidad", Integer.parseInt(editTextCantidad.getText().toString()));
+        intent.putExtra("categoria", spinnerCategoria.getSelectedItem().toString());
+        intent.putExtra("dificultad", spinnerDificultad.getSelectedItem().toString());
+
+        // Iniciar la actividad
+        startActivity(intent);
     }
 }
